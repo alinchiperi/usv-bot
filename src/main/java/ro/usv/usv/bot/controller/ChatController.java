@@ -17,12 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
     private final ChatClient chatClient;
-    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
+    private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
-    @Value("${user.advice}")
-    private String userAdvice;
-
-    public ChatController(ChatClient.Builder builder, VectorStore vectorStore) {
+    public ChatController(ChatClient.Builder builder, VectorStore vectorStore, @Value("${user.advice}") String userAdvice) {
         this.chatClient = builder
                 .defaultAdvisors(
                         new QuestionAnswerAdvisor(vectorStore,
@@ -31,14 +28,14 @@ public class ChatController {
                 .build();
     }
 
-    @GetMapping("/")
-    private String chat(@RequestParam String question) {
-        logger.info("Raw question: {}", question);
+    @GetMapping("")
+    private String chat(@RequestParam("question") String question) {
+        log.info("Raw question: {}", question);
         String content = chatClient.prompt()
                 .user(question)
                 .call()
                 .content();
-        logger.info("AI response: {}", content);
+        log.info("AI response: {}", content);
         return content;
     }
 }
