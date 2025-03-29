@@ -7,13 +7,17 @@ import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ro.usv.usv.bot.model.UserMessage;
 
 @RestController
 @RequestMapping("/api/v1/chat")
+@CrossOrigin
 public class ChatController {
 
     private final ChatClient chatClient;
@@ -28,14 +32,15 @@ public class ChatController {
                 .build();
     }
 
-    @GetMapping("")
-    private String chat(@RequestParam("question") String question) {
-        log.info("Raw question: {}", question);
+    @PostMapping("")
+    private org.springframework.http.ResponseEntity<UserMessage> chat(@RequestBody UserMessage userMessage) {
+        String message = userMessage.message();
+        log.info("Raw question: {}", message);
         String content = chatClient.prompt()
-                .user(question)
+                .user(message)
                 .call()
                 .content();
         log.info("AI response: {}", content);
-        return content;
+        return ResponseEntity.ok(new UserMessage(content));
     }
 }
