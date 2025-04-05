@@ -31,6 +31,8 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     public static final String RETRIEVED_DOCUMENTS = "qa_retrieved_documents";
     public static final String FILTER_EXPRESSION = "qa_filter_expression";
     private static final String USER_ADVICE = """
+            Esti un consultat pentru Universitatea "Stefan cel Mare" din Suceava (USV).
+            Vei raspunde politicos si profesionalist folosind contextul.
             Informatiile de context sunt mai jos, inconjurate de
             
             ---------------------
@@ -38,7 +40,8 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
             ---------------------
             Avand în vedere contextul si informatiile istorice furnizate, si nu cunostintele anterioare,
             raspunde la comentariul utilizatorului. Daca raspunsul nu se afla în context, informeaza
-            utilizatorul ca nu poti raspunde la întrebare.
+            utilizatorul ca nu poti raspunde la întrebare. 
+            In raspuns, nu vei spune ca ai informatii furnizate.
             Vei da raspunsul in limba romana!""";
 
     private static final Logger log = LoggerFactory.getLogger(UsvAdvisor.class);

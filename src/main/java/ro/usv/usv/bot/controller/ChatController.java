@@ -28,8 +28,7 @@ public class ChatController {
         this.chatClient = builder
                 .defaultAdvisors(
                         new UsvAdvisor(vectorStore,
-                                SearchRequest.builder().similarityThreshold(0.5).build()),
-                        new SimpleLoggerAdvisor())
+                                SearchRequest.builder().similarityThreshold(0.5).topK(1).build()))
                 .build();
     }
 
