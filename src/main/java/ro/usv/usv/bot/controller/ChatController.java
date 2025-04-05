@@ -3,7 +3,7 @@ package ro.usv.usv.bot.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ro.usv.usv.bot.advisor.UsvAdvisor;
 import ro.usv.usv.bot.model.UserMessage;
 
 @RestController
@@ -26,9 +27,9 @@ public class ChatController {
     public ChatController(ChatClient.Builder builder, VectorStore vectorStore, @Value("${user.advice}") String userAdvice) {
         this.chatClient = builder
                 .defaultAdvisors(
-                        new QuestionAnswerAdvisor(vectorStore,
-                                SearchRequest.builder().similarityThreshold(0.5).build(),
-                                userAdvice))
+                        new UsvAdvisor(vectorStore,
+                                SearchRequest.builder().similarityThreshold(0.5).build()),
+                        new SimpleLoggerAdvisor())
                 .build();
     }
 
