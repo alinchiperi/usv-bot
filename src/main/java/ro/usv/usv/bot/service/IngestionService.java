@@ -23,15 +23,22 @@ public class IngestionService {
     }
 
     public void processFile(MultipartFile file) throws IOException {
-        log.info("Start processing file: {}", file.getOriginalFilename());
         var resource = convertMultipartFileToResource(file);
+        processResource(resource);
+    }
+
+    public void processResource(Resource resource) {
+        log.info("Start processing resource: {}", resource.getFilename());
+
         var reader = new TikaDocumentReader(resource);
         TextSplitter textSplitter = new TokenTextSplitter();
         vectorStore.accept(textSplitter.apply(reader.get()));
-        log.info("VectorStore loaded with data!");
+
+        log.info("File {} processed successfully", resource.getFilename());
+
     }
 
-    private Resource convertMultipartFileToResource(MultipartFile multipartFile) throws IOException {
+    private Resource convertMultipartFileToResource(MultipartFile multipartFile) {
         return multipartFile.getResource();
     }
 

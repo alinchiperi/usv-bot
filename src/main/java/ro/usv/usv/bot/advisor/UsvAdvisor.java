@@ -106,6 +106,7 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
 
         // 2. Search for similar documents in the vector store.
         String query = new PromptTemplate(request.userText(), request.userParams()).render();
+
         var searchRequestToUse = SearchRequest.from(this.searchRequest)
                 .query(query)
                 .filterExpression(doGetFilterExpression(context))
@@ -114,7 +115,6 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
         List<Document> documents = this.vectorStore.similaritySearch(searchRequestToUse);
         log.info("Found documents: {}", documents.size());
 
-        // 3. Create the context from the documents.
         context.put(RETRIEVED_DOCUMENTS, documents);
         log.info("Context: {}", context);
 
@@ -122,7 +122,6 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
                 .map(Document::getText)
                 .collect(Collectors.joining(System.lineSeparator()));
 
-        // 4. Advise the user parameters.
         Map<String, Object> advisedUserParams = new HashMap<>(request.userParams());
         advisedUserParams.put("question_answer_context", documentContext);
 
