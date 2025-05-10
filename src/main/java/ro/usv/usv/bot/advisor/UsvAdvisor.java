@@ -1,5 +1,6 @@
 package ro.usv.usv.bot.advisor;
 
+import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
@@ -13,12 +14,8 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.vectorstore.filter.FilterExpressionTextParser;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,21 +23,21 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Builder
 public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
 
     public static final String RETRIEVED_DOCUMENTS = "qa_retrieved_documents";
-    public static final String FILTER_EXPRESSION = "qa_filter_expression";
     private static final String USER_ADVICE = """
             Esti un consultat pentru Universitatea "Stefan cel Mare" din Suceava (USV).
             Vei raspunde politicos si profesionalist folosind contextul.
             Informatiile de context sunt mai jos, inconjurate de
-            
+           \s
             ---------------------
             {question_answer_context}
             ---------------------
             Avand în vedere contextul si informatiile istorice furnizate, si nu cunostintele anterioare,
             raspunde la comentariul utilizatorului. Daca raspunsul nu se afla în context, informeaza
-            utilizatorul ca nu poti raspunde la întrebare. 
+            utilizatorul ca nu poti raspunde la întrebare.
             In raspuns, nu vei spune ca ai informatii furnizate.
             Vei da raspunsul in limba romana!""";
 
@@ -66,7 +63,7 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     @Override
     public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
         AdvisedRequest advisedRequest2 = this.before(advisedRequest);
-        log.info("Advised request: {}", advisedRequest2);
+        log.info("Advised request aroundCall: {}", advisedRequest2);
         AdvisedResponse advisedResponse = chain.nextAroundCall(advisedRequest2);
         log.info("Advised response: {}", advisedResponse);
         return this.after(advisedResponse);
@@ -106,11 +103,12 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
 
         // 2. Search for similar documents in the vector store.
         String query = new PromptTemplate(request.userText(), request.userParams()).render();
+        log.info("Query: {}", query);
 
         var searchRequestToUse = SearchRequest.from(this.searchRequest)
                 .query(query)
-                .filterExpression(doGetFilterExpression(context))
                 .build();
+        log.info("Search request: {}", searchRequestToUse);
 
         List<Document> documents = this.vectorStore.similaritySearch(searchRequestToUse);
         log.info("Found documents: {}", documents.size());
@@ -142,15 +140,6 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
         return new AdvisedResponse(chatResponseBuilder.build(), advisedResponse.adviseContext());
     }
 
-    protected Filter.Expression doGetFilterExpression(Map<String, Object> context) {
-
-        if (!context.containsKey(FILTER_EXPRESSION)
-                || !StringUtils.hasText(context.get(FILTER_EXPRESSION).toString())) {
-            return this.searchRequest.getFilterExpression();
-        }
-        return new FilterExpressionTextParser().parse(context.get(FILTER_EXPRESSION).toString());
-
-    }
 
     private Predicate<AdvisedResponse> onFinishReason() {
         return advisedResponse -> advisedResponse.response()

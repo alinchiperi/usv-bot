@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,12 +26,13 @@ public class ChatController {
         this.chatClient = builder
                 .defaultAdvisors(
                         new UsvAdvisor(vectorStore,
-                                SearchRequest.builder().similarityThreshold(0.5).topK(1).build()))
+                                SearchRequest.builder().similarityThreshold(0.5).topK(2).build()))
+
                 .build();
     }
 
     @PostMapping("")
-    private org.springframework.http.ResponseEntity<UserMessage> chat(@RequestBody UserMessage userMessage) {
+    private ResponseEntity<UserMessage> chat(@RequestBody UserMessage userMessage) {
         String message = userMessage.message();
         log.info("Raw question: {}", message);
         String content = chatClient.prompt()
