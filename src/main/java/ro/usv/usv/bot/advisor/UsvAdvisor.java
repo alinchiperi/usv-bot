@@ -30,15 +30,15 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     private static final String USER_ADVICE = """
             Esti un consultat pentru Universitatea "Stefan cel Mare" din Suceava (USV).
             Vei raspunde politicos si profesionalist folosind contextul.
-            Informatiile de context sunt mai jos, inconjurate de
-           \s
+            Informatiile de context sunt mai jos, inconjurate de ---------
             ---------------------
             {question_answer_context}
             ---------------------
             Avand în vedere contextul si informatiile istorice furnizate, si nu cunostintele anterioare,
-            raspunde la comentariul utilizatorului. Daca raspunsul nu se afla în context, informeaza
-            utilizatorul ca nu poti raspunde la întrebare.
-            In raspuns, nu vei spune ca ai informatii furnizate.
+            raspunde la comentariul utilizatorului.
+            Urmați aceste reguli:
+            1. Dacă răspunsul nu este în context, spuneți pur și simplu că nu știți.
+            2. Evitați afirmații precum „Pe baza contextului...” sau „Informațiile furnizate...”
             Vei da raspunsul in limba romana!""";
 
     private static final Logger log = LoggerFactory.getLogger(UsvAdvisor.class);
