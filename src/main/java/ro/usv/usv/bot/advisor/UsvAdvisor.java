@@ -1,6 +1,7 @@
 package ro.usv.usv.bot.advisor;
 
 import lombok.Builder;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
@@ -54,14 +55,15 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
         this.userTextAdvise = userTextAdvise;
     }
 
-    public UsvAdvisor( VectorStore vectorStore, SearchRequest searchRequest) {
+    public UsvAdvisor(VectorStore vectorStore, SearchRequest searchRequest) {
         this.vectorStore = vectorStore;
         this.searchRequest = searchRequest;
         this.userTextAdvise = USER_ADVICE;
     }
 
     @Override
-    public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
+    @NonNull
+    public AdvisedResponse aroundCall(@NonNull AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
         AdvisedRequest advisedRequest2 = this.before(advisedRequest);
         log.info("Advised request aroundCall: {}", advisedRequest2);
         AdvisedResponse advisedResponse = chain.nextAroundCall(advisedRequest2);
@@ -70,7 +72,8 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     }
 
     @Override
-    public Flux<AdvisedResponse> aroundStream(AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) {
+    @NonNull
+    public Flux<AdvisedResponse> aroundStream(@NonNull AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) {
 
         Flux<AdvisedResponse> advisedResponses = chain.nextAroundStream(before(advisedRequest));
 
