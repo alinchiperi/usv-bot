@@ -1,6 +1,7 @@
 package ro.usv.usv.bot.advisor;
 
 import lombok.Builder;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
@@ -30,15 +31,15 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     private static final String USER_ADVICE = """
             Esti un consultat pentru Universitatea "Stefan cel Mare" din Suceava (USV).
             Vei raspunde politicos si profesionalist folosind contextul.
-            Informatiile de context sunt mai jos, inconjurate de
-           \s
+            Informatiile de context sunt mai jos, inconjurate de ---------
             ---------------------
             {question_answer_context}
             ---------------------
             Avand în vedere contextul si informatiile istorice furnizate, si nu cunostintele anterioare,
-            raspunde la comentariul utilizatorului. Daca raspunsul nu se afla în context, informeaza
-            utilizatorul ca nu poti raspunde la întrebare.
-            In raspuns, nu vei spune ca ai informatii furnizate.
+            raspunde la comentariul utilizatorului.
+            Urmați aceste reguli:
+            1. Dacă răspunsul nu este în context, spuneți pur și simplu că nu știți.
+            2. Evitați afirmații precum „Pe baza contextului...” sau „Informațiile furnizate...”
             Vei da raspunsul in limba romana!""";
 
     private static final Logger log = LoggerFactory.getLogger(UsvAdvisor.class);
@@ -54,14 +55,15 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
         this.userTextAdvise = userTextAdvise;
     }
 
-    public UsvAdvisor( VectorStore vectorStore, SearchRequest searchRequest) {
+    public UsvAdvisor(VectorStore vectorStore, SearchRequest searchRequest) {
         this.vectorStore = vectorStore;
         this.searchRequest = searchRequest;
         this.userTextAdvise = USER_ADVICE;
     }
 
     @Override
-    public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
+    @NonNull
+    public AdvisedResponse aroundCall(@NonNull AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
         AdvisedRequest advisedRequest2 = this.before(advisedRequest);
         log.info("Advised request aroundCall: {}", advisedRequest2);
         AdvisedResponse advisedResponse = chain.nextAroundCall(advisedRequest2);
@@ -70,7 +72,8 @@ public class UsvAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     }
 
     @Override
-    public Flux<AdvisedResponse> aroundStream(AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) {
+    @NonNull
+    public Flux<AdvisedResponse> aroundStream(@NonNull AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) {
 
         Flux<AdvisedResponse> advisedResponses = chain.nextAroundStream(before(advisedRequest));
 
