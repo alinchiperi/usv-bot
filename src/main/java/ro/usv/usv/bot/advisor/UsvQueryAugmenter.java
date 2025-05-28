@@ -29,7 +29,7 @@ public class UsvQueryAugmenter implements QueryAugmenter {
             1. Dacă răspunsul nu este în context, spuneți pur și simplu ca nu aveti informatii.
             2. Evitați afirmații precum „Pe baza contextului...” sau „Informațiile furnizate..."
             Interogare: {query}
-            Answer:""");
+            Raspuns:""");
 
     private static final PromptTemplate EMPTY_CONTEXT_PROMPT_TEMPLATE
             = new PromptTemplate("""
