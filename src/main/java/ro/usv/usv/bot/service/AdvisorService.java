@@ -12,7 +12,7 @@ import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import ro.usv.usv.bot.advisor.UsvQueryAugmenter;
-import ro.usv.usv.bot.model.ResponseDemo;
+import ro.usv.usv.bot.model.Response;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class AdvisorService {
         this.vectorStore = vectorStore;
     }
 
-    public ResponseDemo call(String userMessage, int topK, double similarityThreshold) {
+    public Response call(String userMessage, int topK, double similarityThreshold) {
 
         DocumentRetriever documentRetriever = VectorStoreDocumentRetriever.builder()
                 .vectorStore(vectorStore)
@@ -42,7 +42,6 @@ public class AdvisorService {
                 .queryAugmenter(queryAugmenter)
                 .build();
 
-
         Query query = new Query(userMessage);
 
         List<Document> documents = documentRetriever.retrieve(query);
@@ -53,6 +52,6 @@ public class AdvisorService {
                 .call()
                 .content();
 
-        return new ResponseDemo(documents, content);
+        return new Response(documents, content);
     }
 }

@@ -5,5 +5,5 @@ import org.springframework.ai.document.Document;
 import java.util.List;
 
 
-public record ResponseDemo(List<Document> documents, String response) {
+public record Response(List<Document> documents, String response) {
 }

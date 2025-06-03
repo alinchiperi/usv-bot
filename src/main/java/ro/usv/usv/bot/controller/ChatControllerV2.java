@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-import ro.usv.usv.bot.model.ResponseDemo;
+import ro.usv.usv.bot.model.Response;
 import ro.usv.usv.bot.model.UserMessage;
 import ro.usv.usv.bot.service.AdvisorService;
 
@@ -22,9 +21,9 @@ public class ChatControllerV2 {
     }
 
     @PostMapping("")
-    public ResponseDemo response(@RequestBody UserMessage userMessage,
-                                 @RequestParam(defaultValue = "2") int topK,
-                                 @RequestParam(defaultValue = "0.5") double similarityThreshold) {
+    public Response response(@RequestBody UserMessage userMessage,
+                             @RequestParam(defaultValue = "2") int topK,
+                             @RequestParam(defaultValue = "0.5") double similarityThreshold) {
         return advisorService.call(userMessage.message(), topK, similarityThreshold);
     }
 }
