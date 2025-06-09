@@ -22,8 +22,8 @@ public class ChatControllerV2 {
 
     @PostMapping("")
     public Response response(@RequestBody UserMessage userMessage,
-                             @RequestParam(defaultValue = "2") int topK,
-                             @RequestParam(defaultValue = "0.5") double similarityThreshold) {
+                             @RequestParam(defaultValue = "3") int topK,
+                             @RequestParam(defaultValue = "0.6") double similarityThreshold) {
         return advisorService.call(userMessage.message(), topK, similarityThreshold);
     }
 }
