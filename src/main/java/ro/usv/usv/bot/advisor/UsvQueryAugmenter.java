@@ -34,7 +34,8 @@ public class UsvQueryAugmenter implements QueryAugmenter {
     private static final PromptTemplate EMPTY_CONTEXT_PROMPT_TEMPLATE
             = new PromptTemplate("""
             Interogarea utilizatorului este în afara bazei ta de cunoștințe.
-            Informați politicos utilizatorul că nu poti răspunde la ea fara sa specifici contextul.""");
+            Informați politicos utilizatorul că nu poti răspunde la ea fara sa specifici contextul.
+            intrebarea: {query}""");
 
 
     @NonNull
@@ -60,6 +61,7 @@ public class UsvQueryAugmenter implements QueryAugmenter {
 
 
     private Query augmentQueryWhenEmptyContext(Query query) {
-        return new Query(EMPTY_CONTEXT_PROMPT_TEMPLATE.render());
+        Map<String, Object> promptParameters = Map.of("query", query.text());
+        return new Query(EMPTY_CONTEXT_PROMPT_TEMPLATE.render(promptParameters));
     }
 }
